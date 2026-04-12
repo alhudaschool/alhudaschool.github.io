@@ -166,7 +166,6 @@
     <iframe id="appFrame" src="about:blank" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
 
     <script>
-        // 🛑 NEW DEPLOYED GOOGLE APPS SCRIPT URL APPLIED HERE:
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbz_rJ9Nd1MC-lTtXg_cQevDyhVau8SKku1VqNvJ9Xr5PkrxQfzr6UlW1x2BjtR4OPpi/exec';
         
         const iframe = document.getElementById('appFrame');
@@ -174,13 +173,10 @@
         const loginWrapper = document.getElementById('login-wrapper');
         const errorMsg = document.getElementById('error-msg');
 
-        // --- CACHE / REMEMBER ME LOGIC ON LOAD ---
         window.onload = () => {
-            // Load cached credentials into inputs
             if(localStorage.getItem('alhuda_user')) document.getElementById('username').value = localStorage.getItem('alhuda_user');
             if(localStorage.getItem('alhuda_pass')) document.getElementById('password').value = localStorage.getItem('alhuda_pass');
 
-            // If user previously logged in securely, skip login screen automatically
             if (localStorage.getItem('alhuda_logged_in') === 'true') {
                 loginWrapper.style.display = 'none';
                 preloader.style.display = 'flex';
@@ -196,7 +192,6 @@
             const pass = document.getElementById('password').value;
 
             if (user === 'alhuda' && pass === 'alhuda143') {
-                // Save session & cache credentials
                 localStorage.setItem('alhuda_logged_in', 'true');
                 localStorage.setItem('alhuda_user', user);
                 localStorage.setItem('alhuda_pass', pass);
@@ -218,7 +213,7 @@
             }
         };
 
-        // --- MESSAGES FROM IFRAME (Fullscreen & Logout) ---
+        // --- UPDATED: BULLETPROOF FULLSCREEN & LOGOUT MESSAGES ---
         window.addEventListener("message", (event) => {
             if (event.data === "toggleFullscreen") {
                 if (!document.fullscreenElement) {
@@ -228,17 +223,19 @@
                 }
             } 
             else if (event.data === "logout") {
-                // Wipe login state and return to login screen
                 localStorage.removeItem('alhuda_logged_in');
                 iframe.style.display = 'none';
                 iframe.src = 'about:blank';
                 loginWrapper.style.display = 'flex';
-                errorMsg.style.display = 'none'; // reset error message just in case
+                errorMsg.style.display = 'none'; 
             }
         });
 
+        // Sends message back to iframe to change the SVG icons
         document.addEventListener("fullscreenchange", () => {
-            if (!document.fullscreenElement) {
+            if (document.fullscreenElement) {
+                iframe.contentWindow.postMessage("enteredFullscreen", "*");
+            } else {
                 iframe.contentWindow.postMessage("exitedFullscreen", "*");
             }
         });
