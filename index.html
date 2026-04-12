@@ -77,12 +77,33 @@
         const loginWrapper = document.getElementById('login-wrapper');
         const errorMsg = document.getElementById('error-msg');
 
+        // --- CACHE / REMEMBER ME LOGIC ON LOAD ---
+        window.onload = () => {
+            // Load cached credentials into inputs
+            if(localStorage.getItem('alhuda_user')) document.getElementById('username').value = localStorage.getItem('alhuda_user');
+            if(localStorage.getItem('alhuda_pass')) document.getElementById('password').value = localStorage.getItem('alhuda_pass');
+
+            // If user previously logged in securely, skip login screen automatically
+            if (localStorage.getItem('alhuda_logged_in') === 'true') {
+                loginWrapper.style.display = 'none';
+                preloader.style.display = 'flex';
+                preloader.style.opacity = '1';
+                iframe.style.display = 'block';
+                iframe.src = webAppUrl + window.location.search;
+            }
+        };
+
         function attemptLogin(event) {
             event.preventDefault();
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
 
             if (user === 'alhuda' && pass === 'alhuda143') {
+                // Save session & cache credentials
+                localStorage.setItem('alhuda_logged_in', 'true');
+                localStorage.setItem('alhuda_user', user);
+                localStorage.setItem('alhuda_pass', pass);
+
                 loginWrapper.style.display = 'none';
                 preloader.style.display = 'flex';
                 preloader.style.opacity = '1';
@@ -100,8 +121,7 @@
             }
         };
 
-        // --- NEW: THE FULLSCREEN BRIDGE ---
-        // 1. Listen for the inner app asking to go fullscreen
+        // --- MESSAGES FROM IFRAME (Fullscreen & Logout) ---
         window.addEventListener("message", (event) => {
             if (event.data === "toggleFullscreen") {
                 if (!document.fullscreenElement) {
@@ -109,10 +129,17 @@
                 } else {
                     if (document.exitFullscreen) { document.exitFullscreen(); }
                 }
+            } 
+            else if (event.data === "logout") {
+                // Wipe login state and return to login screen
+                localStorage.removeItem('alhuda_logged_in');
+                iframe.style.display = 'none';
+                iframe.src = 'about:blank';
+                loginWrapper.style.display = 'flex';
+                errorMsg.style.display = 'none'; // reset error message just in case
             }
         });
 
-        // 2. Tell the inner app if you press "ESC" to exit fullscreen
         document.addEventListener("fullscreenchange", () => {
             if (!document.fullscreenElement) {
                 iframe.contentWindow.postMessage("exitedFullscreen", "*");
