@@ -5,140 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Al-huda Knowledge Competition System</title>
     <style>
-        /* Removes all borders and margins, making the app take over the entire screen */
         body, html { 
             margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; 
-            background-color: #1a202c; /* Matches your login background */
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a202c; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        iframe { border: none; width: 100%; height: 100%; display: none; }
         
-        iframe { 
-            border: none; 
-            width: 100%; 
-            height: 100%; 
-            display: none; /* Hidden until successful login */
-        }
-
-        /* --- PRELOADER STYLES --- */
         #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #1a202c; /* Seamlessly matches the background */
-            display: none; /* Hidden until successful login */
-            justify-content: center;
-            align-items: center;
-            z-index: 9999; /* Ensures it stays on top of the iframe */
-            transition: opacity 0.5s ease; /* Smooth fade-out effect */
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #1a202c; display: none; flex-direction: column; justify-content: center;
+            align-items: center; z-index: 9999; transition: opacity 0.5s ease;
         }
-
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1); /* Subtle dark ring */
-            border-left-color: #ffc107; /* Matches the brand yellow */
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
+            border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #ffc107;
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 30px;
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Mobile Fallback Button */
+        #mobile-fallback {
+            display: none; background: #dc2626; color: white; border: none; padding: 15px 30px;
+            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); animation: fadeIn 0.5s; text-align: center;
         }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- BRANDED LOGIN STYLES --- */
         #login-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            background-color: #cbd5e1; /* Brand light background */
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10000;
+            display: flex; justify-content: center; align-items: center; height: 100vh;
+            width: 100vw; background-color: #cbd5e1; position: absolute; top: 0; left: 0; z-index: 10000;
         }
-
         .login-box {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            border-top: 6px solid #0a2540; /* Brand dark navy */
+            background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            width: 90%; max-width: 400px; text-align: center; border-top: 6px solid #0a2540;
         }
-
-        .login-box h2 {
-            color: #0a2540;
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #111827;
-            font-size: 14px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #ffc107; /* Accent yellow on focus */
-        }
-
+        .login-box h2 { color: #0a2540; margin-top: 0; margin-bottom: 25px; font-size: 28px; font-weight: 800; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #111827; font-size: 14px; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+        .input-group input:focus { outline: none; border-color: #ffc107; }
         .login-btn {
-            background-color: #ffc107; /* Brand accent yellow */
-            color: #000000;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-            margin-top: 10px;
+            background-color: #ffc107; color: #000000; border: none; padding: 14px; width: 100%;
+            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); margin-top: 10px;
         }
-
-        .login-btn:active {
-            transform: scale(0.98);
-        }
-
-        .login-btn:hover {
-            opacity: 0.9;
-        }
-
-        .error-msg {
-            color: #dc2626; /* Brand red for errors */
-            margin-top: 15px;
-            font-weight: bold;
-            display: none;
-        }
+        .error-msg { color: #dc2626; margin-top: 15px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
@@ -161,28 +70,28 @@
 
     <div id="preloader">
         <div class="spinner"></div>
+        <button id="mobile-fallback" onclick="loadDirectMobile()">App taking too long? Tap here to open Mobile Version</button>
     </div>
 
-    <iframe id="appFrame" src="about:blank" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
+    <iframe id="appFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
 
     <script>
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbz_rJ9Nd1MC-lTtXg_cQevDyhVau8SKku1VqNvJ9Xr5PkrxQfzr6UlW1x2BjtR4OPpi/exec';
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxy5ektlMzFSJvqumAF6ov5oG7TCmrQ6s8afFr242RpbHuMm9-rK2sjVqG91oKiffR-/exec';
         
         const iframe = document.getElementById('appFrame');
         const preloader = document.getElementById('preloader');
         const loginWrapper = document.getElementById('login-wrapper');
         const errorMsg = document.getElementById('error-msg');
+        const mobileFallback = document.getElementById('mobile-fallback');
+        
+        let loadTimeout;
 
         window.onload = () => {
             if(localStorage.getItem('alhuda_user')) document.getElementById('username').value = localStorage.getItem('alhuda_user');
             if(localStorage.getItem('alhuda_pass')) document.getElementById('password').value = localStorage.getItem('alhuda_pass');
 
             if (localStorage.getItem('alhuda_logged_in') === 'true') {
-                loginWrapper.style.display = 'none';
-                preloader.style.display = 'flex';
-                preloader.style.opacity = '1';
-                iframe.style.display = 'block';
-                iframe.src = webAppUrl + window.location.search;
+                startSystemLoad();
             }
         };
 
@@ -195,25 +104,38 @@
                 localStorage.setItem('alhuda_logged_in', 'true');
                 localStorage.setItem('alhuda_user', user);
                 localStorage.setItem('alhuda_pass', pass);
-
-                loginWrapper.style.display = 'none';
-                preloader.style.display = 'flex';
-                preloader.style.opacity = '1';
-                iframe.style.display = 'block';
-                iframe.src = webAppUrl + window.location.search;
+                startSystemLoad();
             } else {
                 errorMsg.style.display = 'block';
             }
         }
 
+        function startSystemLoad() {
+            loginWrapper.style.display = 'none';
+            preloader.style.display = 'flex';
+            preloader.style.opacity = '1';
+            iframe.style.display = 'block';
+            iframe.src = webAppUrl + window.location.search;
+
+            // If the iframe hasn't loaded after 4.5 seconds (likely blocked by Android), show the fallback button
+            loadTimeout = setTimeout(() => {
+                mobileFallback.style.display = 'block';
+            }, 4500);
+        }
+
+        // The fallback bypasses the iframe and loads the direct URL, ensuring Androids can always get in
+        function loadDirectMobile() {
+            window.location.href = webAppUrl + window.location.search;
+        }
+
         iframe.onload = () => {
             if (iframe.src !== 'about:blank' && iframe.src !== '') {
+                clearTimeout(loadTimeout); // Cancel the fallback button if it loaded successfully!
                 preloader.style.opacity = '0';
                 setTimeout(() => { preloader.style.display = 'none'; }, 500);
             }
         };
 
-        // --- UPDATED: BULLETPROOF FULLSCREEN & LOGOUT MESSAGES ---
         window.addEventListener("message", (event) => {
             if (event.data === "toggleFullscreen") {
                 if (!document.fullscreenElement) {
@@ -226,12 +148,12 @@
                 localStorage.removeItem('alhuda_logged_in');
                 iframe.style.display = 'none';
                 iframe.src = 'about:blank';
+                mobileFallback.style.display = 'none';
                 loginWrapper.style.display = 'flex';
                 errorMsg.style.display = 'none'; 
             }
         });
 
-        // Sends message back to iframe to change the SVG icons
         document.addEventListener("fullscreenchange", () => {
             if (document.fullscreenElement) {
                 iframe.contentWindow.postMessage("enteredFullscreen", "*");
