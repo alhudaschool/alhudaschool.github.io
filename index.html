@@ -22,7 +22,6 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Mobile Fallback Button */
         #mobile-fallback {
             display: none; background: #dc2626; color: white; border: none; padding: 15px 30px;
             font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
@@ -36,7 +35,7 @@
         }
         .login-box {
             background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-            width: 90%; max-width: 400px; text-align: center; border-top: 6px solid #0a2540;
+            width: 90%; max-width: 400px; text-align: center; border-top: 6px solid #0a2540; box-sizing: border-box;
         }
         .login-box h2 { color: #0a2540; margin-top: 0; margin-bottom: 25px; font-size: 28px; font-weight: 800; }
         .input-group { margin-bottom: 20px; text-align: left; }
@@ -48,6 +47,13 @@
             font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); margin-top: 10px;
         }
         .error-msg { color: #dc2626; margin-top: 15px; font-weight: bold; display: none; }
+
+        /* MOBILE LOGIN TWEAKS */
+        @media (max-width: 480px) {
+            .login-box { padding: 25px; }
+            .login-box h2 { font-size: 24px; }
+            .login-btn { padding: 12px; font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -117,20 +123,18 @@
             iframe.style.display = 'block';
             iframe.src = webAppUrl + window.location.search;
 
-            // If the iframe hasn't loaded after 4.5 seconds (likely blocked by Android), show the fallback button
             loadTimeout = setTimeout(() => {
                 mobileFallback.style.display = 'block';
             }, 4500);
         }
 
-        // The fallback bypasses the iframe and loads the direct URL, ensuring Androids can always get in
         function loadDirectMobile() {
             window.location.href = webAppUrl + window.location.search;
         }
 
         iframe.onload = () => {
             if (iframe.src !== 'about:blank' && iframe.src !== '') {
-                clearTimeout(loadTimeout); // Cancel the fallback button if it loaded successfully!
+                clearTimeout(loadTimeout); 
                 preloader.style.opacity = '0';
                 setTimeout(() => { preloader.style.display = 'none'; }, 500);
             }
