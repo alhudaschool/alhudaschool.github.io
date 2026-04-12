@@ -26,13 +26,8 @@
             display: none; background: #dc2626; color: white; border: none; padding: 15px 30px;
             font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); animation: fadeIn 0.5s; text-align: center;
-            margin-top: 20px;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .mobile-loading-text {
-            color: white; font-size: 20px; font-weight: bold; text-align: center; display: none;
-        }
 
         #login-wrapper {
             display: flex; justify-content: center; align-items: center; height: 100vh;
@@ -81,8 +76,7 @@
 
     <div id="preloader">
         <div class="spinner"></div>
-        <div id="mobile-loading-text" class="mobile-loading-text">Redirecting to Secure Mobile App...</div>
-        <button id="mobile-fallback" onclick="loadDirectMobile()">App taking too long? Tap here to load manually</button>
+        <button id="mobile-fallback" onclick="loadDirectMobile()">App taking too long? Tap here to open Mobile Version</button>
     </div>
 
     <iframe id="appFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" allow="fullscreen" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"></iframe>
@@ -95,7 +89,6 @@
         const loginWrapper = document.getElementById('login-wrapper');
         const errorMsg = document.getElementById('error-msg');
         const mobileFallback = document.getElementById('mobile-fallback');
-        const mobileLoadingText = document.getElementById('mobile-loading-text');
         
         let loadTimeout;
 
@@ -127,25 +120,12 @@
             loginWrapper.style.display = 'none';
             preloader.style.display = 'flex';
             preloader.style.opacity = '1';
+            iframe.style.display = 'block';
+            iframe.src = webAppUrl + window.location.search;
 
-            // SMART ROUTER: Detect if the user is on a Mobile Device
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 850;
-
-            if (isMobile) {
-                // MOBILE: Bypass iframe to prevent Google Drive cookie block. Redirect directly to App.
-                mobileLoadingText.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = webAppUrl + window.location.search;
-                }, 800); // Tiny delay so they see the spinner before jumping
-            } else {
-                // PC: Load safely inside the iframe
-                iframe.style.display = 'block';
-                iframe.src = webAppUrl + window.location.search;
-
-                loadTimeout = setTimeout(() => {
-                    mobileFallback.style.display = 'block';
-                }, 4500);
-            }
+            loadTimeout = setTimeout(() => {
+                mobileFallback.style.display = 'block';
+            }, 4500);
         }
 
         function loadDirectMobile() {
