@@ -5,45 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses Management Library</title>
     <style>
+        /* Removes all borders and margins, making the app take over the entire screen */
         body, html { 
             margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; 
-            background-color: #1a202c; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a202c; /* Matches your login background */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        iframe { border: none; width: 100%; height: 100%; display: none; }
+        
+        iframe { 
+            border: none; 
+            width: 100%; 
+            height: 100%; 
+            display: none; /* Hidden until successful login */
+        }
+
+        /* --- PRELOADER STYLES --- */
         #preloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #1a202c; display: none; justify-content: center;
-            align-items: center; z-index: 9999; transition: opacity 0.5s ease;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #1a202c; /* Seamlessly matches the background */
+            display: none; /* Hidden until successful login */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Ensures it stays on top of the iframe */
+            transition: opacity 0.5s ease; /* Smooth fade-out effect */
         }
+
         .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.1); border-left-color: #ffc107;
-            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite;
+            border: 4px solid rgba(255, 255, 255, 0.1); /* Subtle dark ring */
+            border-left-color: #ffc107; /* Matches the brand yellow */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- BRANDED LOGIN STYLES --- */
         #login-wrapper {
-            display: flex; justify-content: center; align-items: center; height: 100vh;
-            width: 100vw; background-color: #cbd5e1; position: absolute; top: 0; left: 0; z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #cbd5e1; /* Brand light background */
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10000;
         }
+
         .login-box {
-            background: #ffffff; padding: 40px; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,0.3);
-            width: 90%; max-width: 400px; text-align: center; border-top: 6px solid #0a2540;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border-top: 6px solid #0a2540; /* Brand dark navy */
         }
-        .login-box h2 { color: #0a2540; margin-top: 0; margin-bottom: 25px; font-size: 28px; font-weight: 800; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #111827; font-size: 14px; }
+
+        .login-box h2 {
+            color: #0a2540;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #111827;
+            font-size: 14px;
+        }
+
         .input-group input {
-            width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px;
-            font-size: 16px; box-sizing: border-box; transition: border-color 0.3s;
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
         }
-        .input-group input:focus { outline: none; border-color: #ffc107; }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #ffc107; /* Accent yellow on focus */
+        }
+
         .login-btn {
-            background-color: #ffc107; color: #000000; border: none; padding: 14px; width: 100%;
-            font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s; box-shadow: 0 4px 10px rgba(0,0,0,0.15); margin-top: 10px;
+            background-color: #ffc107; /* Brand accent yellow */
+            color: #000000;
+            border: none;
+            padding: 14px;
+            width: 100%;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin-top: 10px;
         }
-        .login-btn:active { transform: scale(0.98); }
-        .login-btn:hover { opacity: 0.9; }
-        .error-msg { color: #dc2626; margin-top: 15px; font-weight: bold; display: none; }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .error-msg {
+            color: #dc2626; /* Brand red for errors */
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+        }
     </style>
 </head>
 <body>
